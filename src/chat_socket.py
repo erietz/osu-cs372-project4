@@ -16,13 +16,19 @@ class BrokenSocketConnection(Exception):
         super().__init__(message)
 
 
-class Socket:
+class ChatSocket:
     def __init__(self, sock: socket.socket = None):
         self.max_recv_length = 2048     # 2 KiB
         if sock is None:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         else:
             self.sock = sock
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args, **kwargs):
+        self.close()
 
     def connect(self, host: str, port: int):
         self.sock.connect((host, port))

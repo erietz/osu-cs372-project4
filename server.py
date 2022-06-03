@@ -1,5 +1,5 @@
 import socket
-from my_socket import Socket
+from src.chat_socket import ChatSocket
 
 SERVER_NAME = "localhost"
 SERVER_PORT = 50000
@@ -18,20 +18,17 @@ def main():
 
         connection_socket, client_address = server.accept()
         print("connected by", client_address)
-        connection_socket = Socket(connection_socket)
 
-        print("waiting for message")
-        message = connection_socket.receive_message()
-        print(message)
-        print("type \\q to quit")
+        with ChatSocket(connection_socket) as connection_socket:
+            print("waiting for message")
+            message = connection_socket.receive_message()
+            print(message)
+            print("type \\q to quit")
 
-        print("Enter message to send...")
-        send_and_receive_messages(connection_socket)
+            print("Enter message to send...")
+            send_and_receive_messages(connection_socket)
 
-        connection_socket.close()
-
-
-def send_and_receive_messages(sock: Socket) -> None:
+def send_and_receive_messages(sock: ChatSocket) -> None:
     while (msg := input("> ")) != "/q":
         sock.send_message(msg)
         print(sock.receive_message())
