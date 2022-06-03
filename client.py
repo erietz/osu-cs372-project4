@@ -15,7 +15,7 @@ from src.chat_socket import ChatSocket
 
 SERVER_NAME = "localhost"
 if len(sys.argv) > 1:
-    SERVER_PORT = sys.argv[1]
+    SERVER_PORT = int(sys.argv[1])
 else:
     SERVER_PORT = 50000
 
