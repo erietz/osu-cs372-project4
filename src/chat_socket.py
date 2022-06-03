@@ -6,6 +6,7 @@ Description : Wrapper class over the low level socket module
 References:
     https://docs.python.org/3/library/socket.html
     https://docs.python.org/3/howto/sockets.html
+    https://realpython.com/python-with-statement/
 """
 
 import socket
@@ -25,9 +26,11 @@ class ChatSocket:
             self.sock = sock
 
     def __enter__(self):
+        """called by the with statement to enter the runtime context"""
         return self
 
     def __exit__(self, *args, **kwargs):
+        """called when the execution leaves the with code block"""
         self.close()
 
     def connect(self, host: str, port: int):
@@ -78,3 +81,11 @@ class ChatSocket:
             chunks.append(chunk)
             bytes_received += len(chunk)
         return b''.join(chunks).decode()
+
+    def chat(self, input_prompt="> ") -> None:
+        try:
+            while (msg := input(input_prompt)) != "/q":
+                self.send_message(msg)
+                print(self.receive_message())
+        except BrokenSocketConnection as ex:
+            print(ex)
