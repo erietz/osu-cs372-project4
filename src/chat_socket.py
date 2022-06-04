@@ -81,6 +81,8 @@ class ChatSocket:
         message_length = len(msg)
 
         self._send_message_length(message_length)
+        # block so that receiver processes length first before getting mashed
+        # together with the message.
         ack = self._receive_message_length()
         assert ack == message_length
 
@@ -121,10 +123,11 @@ class ChatSocket:
         text on the terminal.
         """
         # if other side of socket quits using /q, the socket connection is
-        # broken.
+        # broken and it throws an error.
         try:
             while (msg := input(input_prompt)) != "/q":
                 self.send_message(msg)
                 print(self.receive_message())
-        except BrokenSocketConnection as ex:
+            self.close()
+        except Exception as ex:
             print(ex)
