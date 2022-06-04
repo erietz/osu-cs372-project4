@@ -1,12 +1,14 @@
 import unittest
 import socket
-import  multiprocessing as mp
+import multiprocessing as mp
 from src.chat_socket import ChatSocket, BrokenSocketConnection
 
 
 class ChatSocketTests(unittest.TestCase):
     def setUp(self):
         hostname = "localhost"
+        # using a port number of 0 will give us a random port that is not
+        # currently being used.
         port = 0
         address = (hostname, port)
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,6 +40,11 @@ class ChatSocketTests(unittest.TestCase):
         self.assertEqual(recv_length, send_length)
 
     def test_send_and_receive_message(self):
+        """
+        socket.send() is blocked until the other end calls socket.recv(). To
+        get around this issues, I use multiprocessing to run both processes at
+        the same time.
+        """
         send_string = "this is a message from the client to the server"
 
         def send():
